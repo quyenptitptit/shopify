@@ -1,0 +1,24 @@
+{
+  "name": "extensive-shipping-app",
+  "version": "1.0.0",
+  "main": "web/index.js",
+  "license": "UNLICENSED",
+  "scripts": {
+    "shopify": "shopify",
+    "build": "shopify app build",
+    "dev": "shopify app dev",
+    "info": "shopify app info",
+    "scaffold": "shopify app scaffold",
+    "deploy": "shopify app deploy"
+  },
+  "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^35.0.1",
+    "@ckeditor/ckeditor5-react": "^5.0.2",
+    "@react-icons/all-files": "^4.1.0",
+    "@shopify/app": "3.7.1",
+    "@shopify/cli": "3.7.1",
+    "express": "^4.18.1",
+    "recoil": "^0.7.5"
+  },
+  "author": "fpt"
+}
