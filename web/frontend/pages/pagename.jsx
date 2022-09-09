@@ -10,7 +10,6 @@ import {
   Button,
   Select,
   Stack,
-  ButtonGroup,
   Frame,
   Loading,
 } from "@shopify/polaris";
@@ -21,20 +20,20 @@ import { useNavigate } from "@shopify/app-bridge-react";
 import { useAuthenticatedFetch } from "../hooks";
 import { useRecoilState } from "recoil";
 import { selectedVisibiity } from "../recoil/selectedVisibility";
-import { itemState } from "../recoil/items";
-import { useLocation } from "react-router-dom";
-// import { createPage } from '../services/Service'
+import { pagesRecoil } from "../recoil/items";
+
 
 export default function PageName(props) {
-  const [selected, setSelected] = useState(["display"]);
-  const [isSelect, setIsSelect] = useRecoilState(selectedVisibiity);
-  const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
-  const [items, setItems] = useRecoilState(itemState);
-  const [loading, setLoading] = useState(false);
-
+  const today = new Date();
   const navigate = useNavigate();
   const fetchApi = useAuthenticatedFetch();
+
+  const [selected, setSelected] = useState(["display"]);
+  const [isSelect, setIsSelect] = useRecoilState(selectedVisibiity);
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [items, setItems] = useRecoilState(pagesRecoil);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = useCallback((value) => {
     setSelected(value);
@@ -44,11 +43,6 @@ export default function PageName(props) {
   const handleChangeTitle = useCallback((value) => setTitle(value), []);
 
   const handleClickSave = () => {
-    // const newPage = {
-    //   title: title,
-    //   body_html: body,
-    //   published: false
-    // };
     let newPage = {
       title: title,
       body_html: body,
@@ -56,7 +50,7 @@ export default function PageName(props) {
     };
 
     if (props.id) {
-      const handleUpdatePage = () => {
+      const handleUpdatePage = async () => {
         setLoading(true);
         const options = {
           method: "PUT",
@@ -68,33 +62,19 @@ export default function PageName(props) {
             id: +props.id,
             title: title,
             body_html: body,
-            published: selected[0]==='hidden' ? false : true
+            published: selected[0] === "hidden" ? false : true,
           }),
         };
         fetchApi(`/api/pages/${props.id}`, options)
           .then((res) => {
-            // console.log(res);
-            setLoading(false)
-            navigate('/')
-            // res.json();
+            setLoading(false);
+            navigate("/")
           })
-          // .then((data) => {
-          //     if (data.hasOwnProperty("success")) {
-          //         // setShowToast(true);
-          //         // setErrorMessage("");
-          //     } else {
-          //         setErrorMessage(Object.entries(data.response.body.errors));
-          //         // setShowToast(true);
-          //     }
-          //     setLoading(false);
-          // })
           .catch((error) => {
-            // setErrorMessage("Error");
-            // setShowToast(true);
             console.log(error);
           });
-        };
-        handleUpdatePage();
+      };
+      handleUpdatePage();
     } else {
       const createPage = async () => {
         const options = {
@@ -106,7 +86,6 @@ export default function PageName(props) {
           body: JSON.stringify(newPage),
         };
         try {
-          console.log(newPage);
           const res = await fetchApi("/api/pages", options);
           const data = await res.json();
           // console.log(data);
@@ -123,7 +102,7 @@ export default function PageName(props) {
     }
   };
 
-  const handleClickDeletePage = async () => {
+  const handleClickCancel = async () => {
     if (props.id) {
       const options = {
         method: "DELETE",
@@ -143,8 +122,6 @@ export default function PageName(props) {
     }
   };
 
-  const today = new Date();
-
   useEffect(() => {
     setLoading(true);
     if (props.id) {
@@ -159,21 +136,21 @@ export default function PageName(props) {
         try {
           const res = await fetchApi(`api/pages/${props.id}`, options);
           const data = await res.json();
-          console.log(data);
           setTitle(data.title);
           setBody(data.body_html);
           setLoading(false);
-          data.published_at ? setSelected(['display']) : setSelected(['hidden'])
+          data.published_at
+            ? setSelected(["display"])
+            : setSelected(["hidden"]);
           return data;
         } catch (e) {
           console.log(e);
         }
       };
       getPage();
-    }
-    else {
+    } else {
       setTimeout(() => {
-        setLoading(false)
+        setLoading(false);
       }, 300);
     }
   }, []);
@@ -275,7 +252,8 @@ export default function PageName(props) {
               secondaryActions={[
                 {
                   content: props.id ? "Delete page" : "Cancel",
-                  onAction: handleClickDeletePage,
+                  onAction: handleClickCancel,
+                  destructive: props.id ? true : false,
                 },
               ]}
             />

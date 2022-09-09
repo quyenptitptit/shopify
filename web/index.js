@@ -241,7 +241,7 @@ export async function createServer(
       await page.save({
         update: true,
       });
-      res.json({ success: "success" });
+      res.json(page);
     } catch (error) {
       console.log(error);
     }
